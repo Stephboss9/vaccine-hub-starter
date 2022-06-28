@@ -1,4 +1,6 @@
 const db = require("../db")
+const bcrypt = require("bcrypt")
+const {BCRYPT_WORK_FACTOR} = require("../config")
 const {BadRequestError} = require("../utils/errors")
 class User {
 
@@ -36,6 +38,8 @@ class User {
         const lowercaseEmail = credentials.email.toLowerCase()
         console.log("in register method")
 
+        const hashedPW = await bcrypt.hash(credentials.password, BCRYPT_WORK_FACTOR)
+
         const date = new Date().toISOString()
         //insert new row of user info into the db
         const result = await db.query(`
@@ -50,7 +54,7 @@ class User {
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, email, first_name, last_name, location, date;
             `
-        , [credentials.password, credentials.first_name, credentials.last_name, lowercaseEmail, credentials.location, date])
+        , [hashedPW, credentials.first_name, credentials.last_name, lowercaseEmail, credentials.location, date])
         // return the user
 
         const user = result.rows[0]
