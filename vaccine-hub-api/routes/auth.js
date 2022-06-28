@@ -1,6 +1,7 @@
 const express = require("express")
-const storeRouter = express.Router()
-const {userAuth} = require("../models/user")
+const {User} = require("../models/user")
+const router = express.Router()
+
 const {badRequestError, NotFoundError} = require("../utils/errors")
 
 
@@ -8,7 +9,7 @@ const {badRequestError, NotFoundError} = require("../utils/errors")
 
 
 
-storeRouter.post("/login", async (req, res,next) => {
+router.post("/login", async (req, res,next) => {
     try {
 
     }catch(error){
@@ -16,10 +17,12 @@ storeRouter.post("/login", async (req, res,next) => {
     }
 
 })
-storeRouter.post("/register", async (req, res,next) => {
+router.post("/register", async (req, res,next) => {
     try {
 
     }catch(error){
         next(error)
     }
 })
+
+module.exports = router

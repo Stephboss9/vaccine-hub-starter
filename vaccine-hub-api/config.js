@@ -15,7 +15,6 @@ function getDatabaseUri() {
     return process.env.DATABASE_URL || `postgresql://${dbUser}:${dbPass}@${dbHost}:${dbPort}/${dbName}`
 }
 
-console.log("process.env".yellow, Object.keys(process.env))
 console.log("Vaccine Hub Config:".green)
 console.log("PORT:".blue, PORT)
 console.log("DATABASE URI: ".blue, getDatabaseUri())
