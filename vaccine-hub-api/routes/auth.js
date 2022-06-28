@@ -23,4 +23,22 @@ router.post("/register", async (req, res,next) => {
     }
 })
 
+router.post("/updateApt", async(req, res, next) => {
+    try {
+        const currentUser = await user.updateApt(req.body)
+        return res.status(200).json({user:currentUser, message:"Succesfully updated your appointment!"})
+    }catch(error){
+        next(error)
+    }
+})
+
+router.post("/cancelApt", async(req, res, next) => {
+    try {
+        const currentUser = await user.cancelApt(req.body)
+        return res.status(200).json({message:"Succesfully canceled your appointment!", user:currentUser})
+    }catch(error){
+        next(error)
+    }
+})
+
 module.exports = router

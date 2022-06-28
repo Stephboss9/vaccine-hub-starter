@@ -26,6 +26,12 @@ export default function Navbar() {
             <Link to="/register">
               <button className="btn primary">Register</button>
             </Link>
+            <Link to="/cancelApt">
+              <button className="btn primary">Cancel Apt.</button>
+            </Link>
+            <Link to="/updateApt">
+              <button className="btn primary">Update Apt.</button>
+            </Link>
           </li>
         </ul>
       ) : null}

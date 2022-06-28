@@ -44,7 +44,7 @@ class User {
 
     static async register(credentials) {
         //register the user with required info
-        const requiredFields = ["email", "password", "first_name", "last_name"]
+        const requiredFields = ["email", "password", "firstName", "lastName", "location", "date"]
 
         //if any of these are missing throw an error
         requiredFields.forEach(field => {
@@ -81,12 +81,69 @@ class User {
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, email, first_name, last_name, location, date;
             `
-        , [hashedPW, credentials.first_name, credentials.last_name, lowercaseEmail, credentials.location, date])
+        , [hashedPW, credentials.firstName, credentials.lastName, lowercaseEmail, credentials.location, credentials.date])
         // return the user
 
         const user = result.rows[0]
         console.log("returning user")
         return User.makePublicUser(user)
+    }
+
+    static async cancelApt(credentials) {
+          //register the user with required info
+          const requiredFields = ["email", "password", "firstName"]
+
+          //if any of these are missing throw an error
+          requiredFields.forEach(field => {
+              if(!credentials.hasOwnProperty(field)){throw new BadRequestError(`Missing ${field} in request body`)}
+          })
+  
+          if (credentials.email.indexOf("@") <= 0){
+              throw new BadRequestError("Invalid email")
+          }
+          //make sure system with the same information does not already existed
+          const existingUser = await User.fetchUserByEmail(credentials.email)
+  
+          if(existingUser){
+             const result = await db.query(`DELETE FROM users where email = $1
+              `,[credentials.email.toLowerCase()])
+
+              let user = result.rows[0]
+              return user;
+          } else {
+            throw new UnauthorizedError(`You have no existing apt associated with that email`)
+          }
+
+    }
+
+    static async updateApt(credentials) {
+        const requiredFields = ["email", "password", "firstName", "location", "date"]
+        
+        requiredFields.forEach(field => {
+            if(!credentials.hasOwnProperty(field)){throw new BadRequestError(`Missing ${field} in request body`)}
+        })
+
+        if (credentials.email.indexOf("@") <= 0){
+            throw new BadRequestError("Invalid email")
+        }
+        //make sure system with the same information does not already existed
+        const existingUser = await User.fetchUserByEmail(credentials.email)
+
+        if(existingUser){
+           const result = await db.query(`UPDATE users 
+           SET  date = $1,
+                location = $2
+           where email = $3
+            `,[credentials.date, credentials.location, credentials.email.toLowerCase()])
+
+            const query = `SELECT * FROM users WHERE email = $1`
+            const userResult = await db.query(query, [credentials.email.toLowerCase()])
+            let user = userResult.rows[0]
+            return User.makePublicUser(user);
+        } else {
+          throw new UnauthorizedError(`You have no existing apt associated with that email`)
+        }
+
     }
 
     static async fetchUserByEmail (email)
