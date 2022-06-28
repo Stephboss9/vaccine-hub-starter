@@ -1,17 +1,14 @@
 const express = require("express")
-const {User} = require("../models/user")
+const user = require("../models/User")
 const router = express.Router()
 
 const {badRequestError, NotFoundError} = require("../utils/errors")
 
 
-
-
-
-
 router.post("/login", async (req, res,next) => {
     try {
-
+        const currentUser = user.login(req.body)
+        return res.status(200).json({currentUser})
     }catch(error){
         next(error)
     }
@@ -19,7 +16,8 @@ router.post("/login", async (req, res,next) => {
 })
 router.post("/register", async (req, res,next) => {
     try {
-
+        const currentUser = await user.register(req.body)
+        return res.status(201).json({user:currentUser})
     }catch(error){
         next(error)
     }
