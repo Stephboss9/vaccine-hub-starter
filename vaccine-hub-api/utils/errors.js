@@ -17,10 +17,14 @@ class NotFoundError extends ExpressError {
     constructor(message = "Not Found"){
         super(404, message);
     }
-   
+}
+class UnauthorizedError extends ExpressError {
+    constructor(message = "Invalid email/password combo"){
+        super(404, message);
+    }
 }
 
-module.exports = {ExpressError, BadRequestError, NotFoundError}
+module.exports = {ExpressError, UnauthorizedError,  BadRequestError, NotFoundError}
 
 
 

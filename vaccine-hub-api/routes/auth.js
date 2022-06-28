@@ -7,7 +7,7 @@ const {badRequestError, NotFoundError} = require("../utils/errors")
 
 router.post("/login", async (req, res,next) => {
     try {
-        const currentUser = user.login(req.body)
+        const currentUser = await user.login(req.body)
         return res.status(200).json({currentUser})
     }catch(error){
         next(error)

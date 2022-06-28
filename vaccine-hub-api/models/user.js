@@ -1,16 +1,43 @@
 const db = require("../db")
 const bcrypt = require("bcrypt")
 const {BCRYPT_WORK_FACTOR} = require("../config")
-const {BadRequestError} = require("../utils/errors")
+const {BadRequestError, UnauthorizedError} = require("../utils/errors")
 class User {
+
+    static async makePublicUser(user) {
+        return {
+            id: user.id,
+            email: user.email,
+            date: user.date,
+            location: user.location
+        }
+    }
 
 
     static async login(credentials) {
         //get user email and password from the argument provided
         //if any of those fields are missing throw an error
+        const requiredFields = ["email", "password"]
+        requiredFields.forEach(field => {
+            if(!credentials.hasOwnProperty(field)){throw new BadRequestError(`Missing ${field} in request body`)}
+        })
+
+        if (credentials.email.indexOf("@") <= 0){
+            throw new BadRequestError("Invalid email")
+        }
         //look for the user by email in the submitted db 
+        const existingUser = await User.fetchUserByEmail(credentials.email)
+
+       
         //compare the password with password associated with email in db
         //if there is a match return the user if not return an error
+        if(existingUser){
+            let isValid = await bcrypt.compare(credentials.password, existingUser.password)
+            if(isValid) {
+                return User.makePublicUser(existingUser)
+            }
+        } 
+        throw new UnauthorizedError(`Invalid email/password combo`)
     }
 
 
@@ -59,7 +86,7 @@ class User {
 
         const user = result.rows[0]
         console.log("returning user")
-        return user
+        return User.makePublicUser(user)
     }
 
     static async fetchUserByEmail (email)
